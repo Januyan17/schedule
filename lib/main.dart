@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:schedule/datepicker.dart';
+import 'package:toggle_switch/toggle_switch.dart';
 
 void main() {
   runApp(const MaterialApp(
@@ -21,6 +22,8 @@ class LandingScreen extends StatefulWidget {
 class _LandingScreenState extends State<LandingScreen> {
   File? imageFile;
   String? dropdownValue;
+  String? dropdownValue2;
+  bool isSwitched = false;
 
   _openGallery(BuildContext context) async {
     var picture =
@@ -49,20 +52,20 @@ class _LandingScreenState extends State<LandingScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Make a Choice "),
+            title: const Text("Make a Choice "),
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
                   GestureDetector(
-                    child: Text("Gallery"),
+                    child: const Text("Gallery"),
                     onTap: () {
                       _openGallery(context);
                       Navigator.of(context).pop();
                     },
                   ),
-                  Padding(padding: EdgeInsets.all(8.0)),
+                  const Padding(padding: EdgeInsets.all(8.0)),
                   GestureDetector(
-                    child: Text("Camera"),
+                    child: const Text("Camera"),
                     onTap: () {
                       _openCamera(context);
                       Navigator.of(context).pop();
@@ -80,7 +83,7 @@ class _LandingScreenState extends State<LandingScreen> {
     if (imageFile != null) {
       return Image.file(imageFile!);
     } else {
-      return Text('Choose an image to show',
+      return const Text('Choose an image to show',
           style: TextStyle(fontSize: 18.0, color: Colors.red));
     }
   }
@@ -89,11 +92,30 @@ class _LandingScreenState extends State<LandingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("data"),
+        backgroundColor: Colors.transparent,
+        leading: const Icon(
+          Icons.cancel,
+          color: Colors.blue,
+        ),
+        // ignore: prefer_const_literals_to_create_immutables
+        actions: [
+          const Align(
+            alignment: Alignment.centerRight,
+            child: Padding(
+              padding: EdgeInsets.only(right: 10.0),
+              child: Text(
+                "Next",
+                style:
+                    TextStyle(fontWeight: FontWeight.w600, color: Colors.blue),
+              ),
+            ),
+          )
+        ],
       ),
       body: Container(
+        color: Colors.white,
         child: ListView(
-          padding: EdgeInsets.only(top: 40.0),
+          padding: const EdgeInsets.only(top: 40.0),
           children: <Widget>[
             Container(
                 width: 250,
@@ -102,67 +124,39 @@ class _LandingScreenState extends State<LandingScreen> {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      imageFile == null
-                          ? Text('No image selected.')
-                          : Image.file(imageFile!,
-                              width: 300, height: 200, fit: BoxFit.cover),
+                      _decideImageView(),
                     ])),
-            SizedBox(height: 15.0),
-            Container(
-              child: Row(
-                // ignore: prefer_const_literals_to_create_immutables
-                children: <Widget>[
-                  Padding(padding: EdgeInsets.all(8.0)),
-                  const Expanded(
-                    child: Text('Tag People',
-                        style: TextStyle(color: Colors.black, fontSize: 20),
-                        textAlign: TextAlign.left),
-                  ),
-                  Expanded(
-                    child: DropdownButton<String>(
-                      value: dropdownValue,
-                      alignment: Alignment.topRight,
-                      icon: const Icon(Icons.arrow_drop_down),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          dropdownValue = newValue!;
-                        });
-                      },
-                      items: <String>['Red', 'Green', 'Blue']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
+            const SizedBox(height: 15.0),
+            TextFormField(
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.only(left: 15.0),
+                hintText: 'Write Something Here',
               ),
             ),
-            /////
-            SizedBox(height: 15.0),
-            Container(
-              child: Row(
-                // ignore: prefer_const_literals_to_create_immutables
-                children: <Widget>[
-                  Padding(padding: EdgeInsets.all(8.0)),
-                  const Expanded(
-                    child: Text('Tag People',
-                        style: TextStyle(color: Colors.black, fontSize: 20),
-                        textAlign: TextAlign.left),
-                  ),
-                  Expanded(
+            Row(
+              // ignore: prefer_const_literals_to_create_immutables
+              children: <Widget>[
+                const Padding(padding: EdgeInsets.all(8.0)),
+                const Expanded(
+                  child: Text('Tag People',
+                      style: TextStyle(color: Colors.black, fontSize: 18),
+                      textAlign: TextAlign.left),
+                ),
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.topRight,
                     child: DropdownButton<String>(
                       value: dropdownValue,
                       alignment: Alignment.topRight,
                       icon: const Icon(Icons.arrow_drop_down),
+                      // ignore: non_constant_identifier_names
                       onChanged: (String? newValue) {
                         setState(() {
                           dropdownValue = newValue!;
                         });
                       },
-                      items: <String>['Red', 'Green', 'Blue']
+                      items: <String>['Janu', 'Stelin', 'Sharmi']
                           .map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
@@ -171,29 +165,67 @@ class _LandingScreenState extends State<LandingScreen> {
                       }).toList(),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
+            ),
+            /////
+            const SizedBox(height: 15.0),
+
+            Row(
+              // ignore: prefer_const_literals_to_create_immutables
+              children: <Widget>[
+                const Padding(padding: EdgeInsets.all(8.0)),
+                const Expanded(
+                  child: Text('Add Location',
+                      style: TextStyle(color: Colors.black, fontSize: 18),
+                      textAlign: TextAlign.left),
+                ),
+                Expanded(
+                  child: Container(
+                    alignment: Alignment.topRight,
+                    child: DropdownButton<String>(
+                      value: dropdownValue2,
+                      alignment: Alignment.topRight,
+                      icon: const Icon(Icons.arrow_drop_down),
+                      // ignore: non_constant_identifier_names
+                      onChanged: (String? NewValue) {
+                        setState(() {
+                          dropdownValue2 = NewValue!;
+                        });
+                      },
+                      items: <String>['Jaffna', 'Colombo', 'Galle']
+                          .map<DropdownMenuItem<String>>((String value2) {
+                        return DropdownMenuItem<String>(
+                          value: value2,
+                          child: Text(value2),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+              ],
             ),
             //
 
-            SizedBox(height: 15.0),
-            Container(
-              child: Row(
-                // ignore: prefer_const_literals_to_create_immutables
-                children: <Widget>[
-                  Padding(padding: EdgeInsets.all(10.0)),
-                  const Expanded(
-                    child: Text('Tag People',
-                        style: TextStyle(color: Colors.black, fontSize: 20),
-                        textAlign: TextAlign.left),
-                  ),
-                  const Expanded(
+            const SizedBox(height: 15.0),
+            Row(
+              // ignore: prefer_const_literals_to_create_immutables
+              children: <Widget>[
+                const Padding(padding: EdgeInsets.all(8.0)),
+                const Expanded(
+                  child: Text('Tag People',
+                      style: TextStyle(color: Colors.black, fontSize: 18),
+                      textAlign: TextAlign.left),
+                ),
+                const Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 15.0),
                     child: Text('Tag People',
                         style: TextStyle(color: Colors.black, fontSize: 20),
                         textAlign: TextAlign.end),
                   ),
-                ],
-              ),
+                ),
+              ],
             )
           ],
         ),
